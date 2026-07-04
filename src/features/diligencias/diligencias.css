@@ -1,0 +1,241 @@
+.diligencias-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.diligencias-toolbar {
+  align-items: center;
+  background: linear-gradient(135deg, #fffaf2, #f3e5c4);
+  border: 1px solid #e5dac8;
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(42, 31, 12, 0.1);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+}
+
+.diligencias-toolbar h2 {
+  color: #151917;
+  font-size: 28px;
+  margin: 0;
+}
+
+.diligencias-toolbar p {
+  color: #6c6a64;
+  margin: 6px 0 0;
+}
+
+.diligencias-toolbar__actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.diligencias-toolbar__actions button,
+.empty-diligencias button {
+  align-items: center;
+  background: #151917;
+  border: 0;
+  border-radius: 14px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 8px;
+  padding: 13px 16px;
+}
+
+.diligencias-search {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5dac8;
+  border-radius: 14px;
+  color: #6c6a64;
+  display: flex;
+  gap: 10px;
+  min-width: 360px;
+  padding: 0 12px;
+}
+
+.diligencias-search input {
+  background: transparent;
+  border: 0;
+  color: #1f2428;
+  font: inherit;
+  outline: none;
+  padding: 13px 0;
+  width: 100%;
+}
+
+.diligencias-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diligencia-card {
+  background: #fffaf2;
+  border: 1px solid #e5dac8;
+  border-radius: 22px;
+  box-shadow: 0 18px 45px rgba(42, 31, 12, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+.diligencia-card__top,
+.diligencia-card__footer,
+.diligencia-card__meta,
+.diligencia-card__badges {
+  display: flex;
+  gap: 12px;
+}
+
+.diligencia-card__top {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.diligencia-card__type {
+  color: #b3914d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.diligencia-card h3 {
+  color: #151917;
+  font-size: 22px;
+  margin: 4px 0 0;
+}
+
+.diligencia-card__badges {
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.diligencia-badge,
+.diligencia-priority {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+.badge-neutral { background: #ede7dc; color: #4e4b45; }
+.badge-info { background: #dbeafe; color: #1d4ed8; }
+.badge-primary { background: #efe1bd; color: #7a5b00; }
+.badge-warning { background: #fff0bd; color: #7a5b00; }
+.badge-success { background: #dcefe4; color: #236343; }
+.badge-danger { background: #f5d7d7; color: #8b2424; }
+
+.priority-low { background: #e7ece9; color: #466154; }
+.priority-medium { background: #efe1bd; color: #7a5b00; }
+.priority-high { background: #ffe0c2; color: #9a4b00; }
+.priority-urgent { background: #f5d7d7; color: #8b2424; }
+
+.diligencia-card__process {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5dac8;
+  border-radius: 14px;
+  color: #4e4b45;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+}
+
+.diligencia-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diligencia-card__meta p {
+  color: #1f2428;
+  margin: 0;
+}
+
+.diligencia-card__meta strong {
+  color: #6c6a64;
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.diligencia-card__footer {
+  border-top: 1px solid #e5dac8;
+  color: #4e4b45;
+  justify-content: space-between;
+  padding-top: 16px;
+}
+
+.diligencia-card__footer span,
+.diligencia-card__map {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.diligencia-card__map {
+  color: #151917;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.empty-diligencias {
+  align-items: center;
+  background: #fffaf2;
+  border: 1px dashed #b3914d;
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(42, 31, 12, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.empty-diligencias__icon {
+  align-items: center;
+  background: linear-gradient(135deg, #b3914d, #d7bd78);
+  border-radius: 20px;
+  color: #151917;
+  display: flex;
+  height: 70px;
+  justify-content: center;
+  margin-bottom: 18px;
+  width: 70px;
+}
+
+.empty-diligencias h2 {
+  color: #151917;
+  margin: 0 0 8px;
+}
+
+.empty-diligencias p {
+  color: #6c6a64;
+  line-height: 1.6;
+  margin: 0 0 22px;
+  max-width: 640px;
+}
+
+@media (max-width: 980px) {
+  .diligencias-toolbar,
+  .diligencias-toolbar__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .diligencias-search {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .diligencias-grid,
+  .diligencia-card__meta {
+    grid-template-columns: 1fr;
+  }
+}
