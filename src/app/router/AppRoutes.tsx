@@ -4,7 +4,7 @@ import { AgendaPage } from '../../features/agenda/AgendaPage';
 import { ConfiguracoesPage } from '../../features/configuracoes/ConfiguracoesPage';
 import { ContratantesPage } from '../../features/contratantes/ContratantesPage';
 import { CommandCenterPage } from '../../features/command-center/CommandCenterPage';
-import { DiligenciasPage } from '../../features/diligencias/DiligenciasPage';
+import { DiligenciasPage } from '../../features/diligencias/pages/DiligenciasPage';
 import { FinanceiroPage } from '../../features/financeiro/FinanceiroPage';
 import { ProcessosPage } from '../../features/processos/ProcessosPage';
 import { RelatoriosPage } from '../../features/relatorios/RelatoriosPage';

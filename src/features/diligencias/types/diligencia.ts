@@ -8,6 +8,7 @@ export type DiligenciaTipo =
   | 'Acompanhamento'
   | 'Diligência externa'
   | 'Extrajudicial'
+  | 'Perícia'
   | 'Outro';
 
 export type DiligenciaStatus =
@@ -38,6 +39,9 @@ export type Diligencia = {
   prioridade: DiligenciaPrioridade;
   contratante: string;
   advogadoSolicitante?: string;
+  telefone?: string;
+  whatsapp?: string;
+  email?: string;
   processo?: string;
   tribunal?: string;
   vara?: string;
@@ -48,5 +52,44 @@ export type Diligencia = {
   valorContratado: number;
   valorRecebido: number;
   observacoes?: string;
+  arquivada?: boolean;
+  createdAt: string;
+  updatedAt: string;
   timeline: TimelineEvento[];
 };
+
+export type DiligenciaFormData = Omit<
+  Diligencia,
+  'id' | 'numeroInterno' | 'createdAt' | 'updatedAt' | 'timeline'
+> & {
+  dataPrevistaPagamento?: string;
+  dataPagamento?: string;
+};
+
+export const tiposDiligencia: DiligenciaTipo[] = [
+  'Audiência',
+  'Despacho',
+  'Sustentação oral',
+  'Protocolo',
+  'Carga',
+  'Cópias',
+  'Acompanhamento',
+  'Diligência externa',
+  'Extrajudicial',
+  'Perícia',
+  'Outro',
+];
+
+export const statusDiligencia: DiligenciaStatus[] = [
+  'Recebida',
+  'Confirmada',
+  'Agendada',
+  'Em deslocamento',
+  'Em execução',
+  'Concluída',
+  'Aguardando pagamento',
+  'Recebida financeiramente',
+  'Arquivada',
+];
+
+export const prioridadesDiligencia: DiligenciaPrioridade[] = ['Baixa', 'Média', 'Alta', 'Urgente'];

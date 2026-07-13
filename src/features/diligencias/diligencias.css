@@ -34,17 +34,29 @@
 }
 
 .diligencias-toolbar__actions button,
-.empty-diligencias button {
+.empty-diligencias button,
+.diligencia-primary-button,
+.diligencia-secondary-button {
   align-items: center;
-  background: #151917;
   border: 0;
   border-radius: 14px;
-  color: #ffffff;
   cursor: pointer;
   display: inline-flex;
   font-weight: 700;
   gap: 8px;
   padding: 13px 16px;
+}
+
+.diligencias-toolbar__actions button,
+.empty-diligencias button,
+.diligencia-primary-button {
+  background: #151917;
+  color: #ffffff;
+}
+
+.diligencia-secondary-button {
+  background: #efe6d7;
+  color: #151917;
 }
 
 .diligencias-search {
@@ -69,17 +81,47 @@
   width: 100%;
 }
 
+.diligencias-summary {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.diligencias-summary article {
+  background: #fffaf2;
+  border: 1px solid #e5dac8;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(42, 31, 12, 0.08);
+  padding: 18px;
+}
+
+.diligencias-summary span {
+  color: #6c6a64;
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.diligencias-summary strong {
+  color: #151917;
+  font-size: 28px;
+}
+
 .diligencias-grid {
   display: grid;
   gap: 18px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.diligencia-card {
+.diligencia-card,
+.diligencia-form-panel {
   background: #fffaf2;
   border: 1px solid #e5dac8;
   border-radius: 22px;
   box-shadow: 0 18px 45px rgba(42, 31, 12, 0.1);
+}
+
+.diligencia-card {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -89,7 +131,8 @@
 .diligencia-card__top,
 .diligencia-card__footer,
 .diligencia-card__meta,
-.diligencia-card__badges {
+.diligencia-card__badges,
+.diligencia-card__actions {
   display: flex;
   gap: 12px;
 }
@@ -174,16 +217,108 @@
 }
 
 .diligencia-card__footer span,
-.diligencia-card__map {
+.diligencia-card__actions a,
+.diligencia-card__actions button {
   align-items: center;
   display: inline-flex;
   gap: 8px;
 }
 
-.diligencia-card__map {
+.diligencia-card__actions {
+  flex-wrap: wrap;
+}
+
+.diligencia-card__actions a,
+.diligencia-card__actions button {
+  background: #efe6d7;
+  border: 0;
+  border-radius: 12px;
   color: #151917;
+  cursor: pointer;
+  font-size: 13px;
   font-weight: 800;
+  padding: 10px 12px;
   text-decoration: none;
+}
+
+.diligencia-pending {
+  background: #f5d7d7;
+  border-radius: 12px;
+  color: #8b2424;
+  font-weight: 800;
+  padding: 10px 12px;
+}
+
+.diligencia-form-panel {
+  padding: 22px;
+}
+
+.diligencia-form-panel__header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.diligencia-form-panel__header span {
+  color: #b3914d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.diligencia-form-panel__header h3 {
+  color: #151917;
+  font-size: 26px;
+  margin: 4px 0 0;
+}
+
+.diligencia-conflict {
+  background: #fff0bd;
+  border: 1px solid #dcc17a;
+  border-radius: 14px;
+  color: #7a5b00;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+}
+
+.diligencia-form {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.diligencia-form label {
+  color: #4e4b45;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 6px;
+}
+
+.diligencia-form input,
+.diligencia-form select,
+.diligencia-form textarea {
+  background: #ffffff;
+  border: 1px solid #e5dac8;
+  border-radius: 12px;
+  color: #1f2428;
+  font: inherit;
+  outline: none;
+  padding: 12px;
+  width: 100%;
+}
+
+.diligencia-form textarea {
+  min-height: 90px;
+}
+
+.full {
+  grid-column: 1 / -1;
 }
 
 .empty-diligencias {
@@ -224,7 +359,8 @@
 
 @media (max-width: 980px) {
   .diligencias-toolbar,
-  .diligencias-toolbar__actions {
+  .diligencias-toolbar__actions,
+  .diligencia-form-panel__header {
     align-items: stretch;
     flex-direction: column;
   }
@@ -235,7 +371,42 @@
   }
 
   .diligencias-grid,
-  .diligencia-card__meta {
+  .diligencia-card__meta,
+  .diligencias-summary,
+  .diligencia-form {
     grid-template-columns: 1fr;
+  }
+}
+
+.diligencias-cloud-panel,
+.diligencia-sync-message {
+  background: #fffaf2;
+  border: 1px solid #e5dac8;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 12px 30px rgba(42, 31, 12, 0.08);
+}
+
+.diligencias-cloud-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.diligencias-cloud-panel p {
+  margin: 4px 0 0;
+  color: #6c6a64;
+}
+
+@media (max-width: 760px) {
+  .diligencias-cloud-panel {
+    display: block;
+  }
+
+  .diligencias-cloud-panel button {
+    margin-top: 12px;
+    width: 100%;
   }
 }
