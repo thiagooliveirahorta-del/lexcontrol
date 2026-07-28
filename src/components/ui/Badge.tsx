@@ -1,10 +1,19 @@
-type BadgeVariant = 'default' | 'success' | 'warning' | 'danger';
+import type { ReactNode } from 'react';
 
 type BadgeProps = {
-  children: string;
-  variant?: BadgeVariant;
+  children: ReactNode;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
 };
 
-export function Badge({ children, variant = 'default' }: BadgeProps) {
-  return <span className={`badge badge--${variant}`}>{children}</span>;
+export function Badge({
+  children,
+  variant = 'default',
+}: BadgeProps) {
+  return (
+    <span className={`badge badge-${variant}`}>
+      {children}
+    </span>
+  );
 }
+
+export default Badge;

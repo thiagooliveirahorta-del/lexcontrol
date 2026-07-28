@@ -1,196 +1,176 @@
-import { Archive, CalendarDays, CalendarPlus, Edit3, MapPin, Scale, Wallet } from 'lucide-react';
-import type { Diligencia } from '../types/diligencia';
-import '../diligencias.css';
+import {
+  Calendar,
+  Clock3,
+  Building2,
+  Landmark,
+  FileText,
+  Pencil,
+  Archive,
+} from "lucide-react";
+
+import type { Diligencia } from "../types/diligencia";
 
 type Props = {
   diligencia: Diligencia;
   onEdit: (diligencia: Diligencia) => void;
-  onArchive: (id: string) => void;
+  onArchive: () => void;
 };
 
-const money = (value: number) =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function badgeStatus(status: string) {
+  switch (status.toLowerCase()) {
+    case "pendente":
+      return "bg-yellow-100 text-yellow-800";
 
-const statusClass: Record<string, string> = {
-  Recebida: 'badge-neutral',
-  Confirmada: 'badge-info',
-  Agendada: 'badge-primary',
-  'Em deslocamento': 'badge-warning',
-  'Em execução': 'badge-warning',
-  Concluída: 'badge-success',
-  'Aguardando pagamento': 'badge-danger',
-  'Recebida financeiramente': 'badge-success',
-  Arquivada: 'badge-neutral',
-};
+    case "em andamento":
+      return "bg-blue-100 text-blue-700";
 
-const prioridadeClass: Record<string, string> = {
-  Baixa: 'priority-low',
-  Média: 'priority-medium',
-  Alta: 'priority-high',
-  Urgente: 'priority-urgent',
-};
+    case "concluída":
+      return "bg-green-100 text-green-700";
 
-function googleCalendarUrl(diligencia: Diligencia) {
-  const horaNormalizada =
-    diligencia.hora.length === 5
-      ? `${diligencia.hora}:00`
-      : diligencia.hora;
+    case "arquivada":
+      return "bg-gray-200 text-gray-700";
 
-  const start = new Date(
-    `${diligencia.data}T${horaNormalizada}`,
-  );
-
-  if (Number.isNaN(start.getTime())) {
-    console.error('Data ou hora inválida na diligência:', {
-      data: diligencia.data,
-      hora: diligencia.hora,
-    });
-
-    return '#';
+    default:
+      return "bg-slate-100 text-slate-700";
   }
-
-  const end = new Date(start.getTime() + 60 * 60 * 1000);
-
-  const format = (date: Date) =>
-    date
-      .toISOString()
-      .replace(/[-:]/g, '')
-      .split('.')[0] + 'Z';
-
-  const title = encodeURIComponent(
-    `${diligencia.tipo} - ${diligencia.contratante}`,
-  );
-
-  const details = encodeURIComponent(
-    `Processo: ${diligencia.processo || ''}
-Tribunal: ${diligencia.tribunal || ''}
-Vara: ${diligencia.vara || ''}
-Comarca: ${diligencia.comarca || ''}
-Observações: ${diligencia.observacoes || ''}`,
-  );
-
-  const location = encodeURIComponent(
-    diligencia.endereco || diligencia.comarca || '',
-  );
-
-  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${format(start)}/${format(end)}&details=${details}&location=${location}`;
-}
-function mapsUrl(local?: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(local || '')}`;
 }
 
-export function DiligenciaCard({ diligencia, onEdit, onArchive }: Props) {
-  const pendente = Math.max(
-    0,
-    diligencia.valorContratado - diligencia.valorRecebido,
-  );
+function badgePrioridade(prioridade: string) {
+  switch (prioridade.toLowerCase()) {
+    case "alta":
+      return "bg-red-100 text-red-700";
 
+    case "média":
+      return "bg-yellow-100 text-yellow-700";
+
+    case "baixa":
+      return "bg-green-100 text-green-700";
+
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
+}
+
+export default function DiligenciaCard({
+  diligencia,
+  onEdit,
+  onArchive,
+}: Props) {
   return (
-    <article className="diligencia-card">
-      <div className="diligencia-card__top">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-lg">
+
+      <div className="flex items-start justify-between">
+
         <div>
-          <span className="diligencia-card__type">
-            {diligencia.tipo}
-          </span>
 
-          <h3>{diligencia.numeroInterno}</h3>
+          <h2 className="text-xl font-bold">
+
+            {diligencia.numeroInterno}
+
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+
+            {diligencia.processo || "Sem número de processo"}
+
+          </p>
+
         </div>
 
-        <div className="diligencia-card__badges">
-          <span
-            className={`diligencia-badge ${
-              statusClass[diligencia.status] || 'badge-neutral'
-            }`}
-          >
-            {diligencia.status}
-          </span>
-
-          <span
-            className={`diligencia-priority ${
-              prioridadeClass[diligencia.prioridade] || 'priority-medium'
-            }`}
-          >
-            {diligencia.prioridade}
-          </span>
-        </div>
-      </div>
-
-      <div className="diligencia-card__process">
-        <Scale size={16} />
-        <span>
-          {diligencia.processo || 'Processo não informado'}
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${badgeStatus(
+            diligencia.status
+          )}`}
+        >
+          {diligencia.status}
         </span>
+
       </div>
 
-      <div className="diligencia-card__meta">
-        <p>
-          <strong>Contratante</strong>
+      <div className="mt-6 grid gap-3 md:grid-cols-2">
+
+        <div className="flex items-center gap-2">
+
+          <Building2 size={18} />
+
           {diligencia.contratante}
-        </p>
 
-        <p>
-          <strong>Comarca</strong>
-          {diligencia.comarca}
-        </p>
-      </div>
-
-      <div className="diligencia-card__footer">
-        <span>
-          <CalendarDays size={16} />
-          {diligencia.data} às {diligencia.hora}
-        </span>
-
-        <span>
-          <Wallet size={16} />
-          {money(diligencia.valorContratado)}
-        </span>
-      </div>
-
-      {pendente > 0 && (
-        <div className="diligencia-pending">
-          Pendente: {money(pendente)}
         </div>
-      )}
 
-      <div className="diligencia-card__actions">
-        <a
-          href={googleCalendarUrl(diligencia)}
-          target="_blank"
-          rel="noreferrer"
+        <div className="flex items-center gap-2">
+
+          <Landmark size={18} />
+
+          {diligencia.tribunal}
+
+        </div>
+
+        <div className="flex items-center gap-2">
+
+          <FileText size={18} />
+
+          {diligencia.comarca}
+
+        </div>
+
+        <div className="flex items-center gap-2">
+
+          <Calendar size={18} />
+
+          {diligencia.data}
+
+        </div>
+
+        <div className="flex items-center gap-2">
+
+          <Clock3 size={18} />
+
+          {diligencia.hora}
+
+        </div>
+
+        <div className="font-semibold text-green-700">
+
+          R$ {Number(diligencia.valorContratado).toFixed(2)}
+
+        </div>
+
+      </div>
+
+      <div className="mt-6 flex items-center justify-between">
+
+        <span
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${badgePrioridade(
+            diligencia.prioridade
+          )}`}
         >
-          <CalendarPlus size={16} />
-          Google Agenda
-        </a>
+          {diligencia.prioridade}
+        </span>
 
-        <a
-          href={mapsUrl(
-            diligencia.endereco || diligencia.comarca,
-          )}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <MapPin size={16} />
-          Rota
-        </a>
+        <div className="flex gap-2">
 
-        <button
-          type="button"
-          onClick={() => onEdit(diligencia)}
-        >
-          <Edit3 size={16} />
-          Editar
-        </button>
-
-        {!diligencia.arquivada && (
           <button
             type="button"
-            onClick={() => onArchive(diligencia.id)}
+            onClick={() => onEdit(diligencia)}
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-slate-100"
+          >
+            <Pencil size={16} />
+            Editar
+          </button>
+
+          <button
+            type="button"
+            onClick={onArchive}
+            className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
           >
             <Archive size={16} />
             Arquivar
           </button>
-        )}
+
+        </div>
+
       </div>
-    </article>
+
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-export { DiligenciasPage } from './pages/DiligenciasPage';
+export { default as DiligenciasPage } from './pages/DiligenciasPage';
 export type {
   Diligencia,
   DiligenciaPrioridade,

@@ -1,210 +1,552 @@
-import { useEffect, useMemo, useState } from 'react';
-import { DiligenciaCard } from '../components/DiligenciaCard';
-import { DiligenciaForm } from '../components/DiligenciaForm';
-import { DiligenciasToolbar } from '../components/DiligenciasToolbar';
-import { EmptyDiligencias } from '../components/EmptyDiligencias';
-import {
-  archiveDiligencia,
-  createDiligencia,
-  hasScheduleConflict,
-  loadDiligencias,
-  syncLocalDiligenciasToCloud,
-  updateDiligencia,
-} from '../services/diligenciasStorage';
-import type { Diligencia, DiligenciaFormData } from '../types/diligencia';
-import '../diligencias.css';
+import { useEffect, useMemo, useState } from "react";
 
-export function DiligenciasPage() {
-  const [search, setSearch] = useState('');
-  const [diligencias, setDiligencias] = useState<Diligencia[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<Diligencia | null>(null);
-  const [conflictMessage, setConflictMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+import DiligenciaCard from "../components/DiligenciaCard";
+import { DiligenciaForm } from "../components/DiligenciaForm";
+import { DiligenciaFilters } from "../components/DiligenciaFilters";
+import { DiligenciaStats } from "../components/DiligenciaStats";
+import EmptyState from "../components/EmptyState";
+import toast from "react-hot-toast";
+import { useDiligencias } from "../hooks/useDiligencias";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import { DiligenciaSkeleton } from "../components/DiligenciaSkeleton";
 
-  useEffect(() => {
-    let mounted = true;
+import type {
+    Diligencia,
+    DiligenciaFormData,
+} from "../types/diligencia";
 
-    async function start() {
-      setLoading(true);
-      const loaded = await loadDiligencias();
-      if (mounted) {
-        setDiligencias(loaded);
-        setLoading(false);
-      }
+function DiligenciasPage() {
+
+    const {
+
+        diligencias,
+
+        loading,
+
+        saving,
+
+        error,
+
+        conflictMessage,
+
+        estatisticas,
+
+        criar,
+
+        editar,
+
+        arquivar,
+
+    } = useDiligencias();
+
+    const [mostrarFormulario, setMostrarFormulario] =
+        useState(false);
+
+    const [diligenciaSelecionada, setDiligenciaSelecionada] =
+        useState<Diligencia | null>(null);
+
+    const [textoPesquisa, setTextoPesquisa] = useState(
+    () => localStorage.getItem("lex_pesquisa") ?? ""
+);
+
+const [textoPesquisaDebounce, setTextoPesquisaDebounce] = useState(
+    () => localStorage.getItem("lex_pesquisa") ?? ""
+);
+
+const [statusFiltro, setStatusFiltro] = useState(
+    () => localStorage.getItem("lex_status") ?? "todos"
+);
+
+const [prioridadeFiltro, setPrioridadeFiltro] = useState(
+    () => localStorage.getItem("lex_prioridade") ?? "todas"
+);
+
+const [tipoFiltro, setTipoFiltro] = useState(
+    () => localStorage.getItem("lex_tipo") ?? "todos"
+);
+
+const [ordenacao, setOrdenacao] = useState(
+    () => localStorage.getItem("lex_ordenacao") ?? "data"
+);
+
+        const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+
+const [diligenciaParaArquivar, setDiligenciaParaArquivar] =
+    useState<Diligencia | null>(null);
+
+    useEffect(() => {
+
+    const timer = setTimeout(() => {
+
+        setTextoPesquisaDebounce(textoPesquisa);
+
+    }, 300);
+
+    return () => clearTimeout(timer);
+
+}, [textoPesquisa]);
+
+useEffect(() => {
+
+    localStorage.setItem("lex_pesquisa", textoPesquisa);
+    localStorage.setItem("lex_status", statusFiltro);
+    localStorage.setItem("lex_prioridade", prioridadeFiltro);
+    localStorage.setItem("lex_tipo", tipoFiltro);
+    localStorage.setItem("lex_ordenacao", ordenacao);
+
+}, [
+    textoPesquisa,
+    statusFiltro,
+    prioridadeFiltro,
+    tipoFiltro,
+    ordenacao,
+]);
+
+    function novaDiligencia() {
+
+        setDiligenciaSelecionada(null);
+
+        setMostrarFormulario(true);
+
     }
 
-    start();
+    function editarDiligencia(
+    diligencia: Diligencia
+) {
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    setDiligenciaSelecionada(diligencia);
 
-  const filteredDiligencias = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    setMostrarFormulario(true);
 
-    const ordered = [...diligencias]
-      .filter((diligencia) => !diligencia.arquivada)
-      .sort((a, b) => new Date(`${a.data}T${a.hora}:00`).getTime() - new Date(`${b.data}T${b.hora}:00`).getTime());
-
-    if (!term) return ordered;
-
-    return ordered.filter((diligencia) => {
-      const searchable = [
-        diligencia.numeroInterno,
-        diligencia.tipo,
-        diligencia.status,
-        diligencia.prioridade,
-        diligencia.contratante,
-        diligencia.advogadoSolicitante,
-        diligencia.processo,
-        diligencia.tribunal,
-        diligencia.vara,
-        diligencia.comarca,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-      return searchable.includes(term);
-    });
-  }, [diligencias, search]);
-
-  function handleCreate() {
-    setEditing(null);
-    setConflictMessage(null);
-    setShowForm(true);
-  }
-
-  function handleEdit(diligencia: Diligencia) {
-    setEditing(diligencia);
-    setConflictMessage(null);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  async function handleSubmit(data: DiligenciaFormData) {
-    const candidate = { id: editing?.id ?? '', data: data.data, hora: data.hora };
-    const conflict = hasScheduleConflict(candidate, diligencias);
-
-    if (conflict) {
-      const message = `Possível conflito: ${conflict.tipo} de ${conflict.contratante} no mesmo dia às ${conflict.hora}.`;
-      setConflictMessage(message);
-
-      const confirmSave = window.confirm(`${message}\n\nDeseja salvar mesmo assim?`);
-      if (!confirmSave) return;
-    }
-
-    try {
-      setSaving(true);
-      if (editing) {
-        const saved = await updateDiligencia(editing.id, data, diligencias);
-        setDiligencias((current) => current.map((item) => (item.id === saved.id ? saved : item)));
-      } else {
-        const saved = await createDiligencia(data, diligencias);
-        setDiligencias((current) => [...current, saved]);
-      }
-
-      setShowForm(false);
-      setEditing(null);
-      setConflictMessage(null);
-    } catch (error) {
-      console.error(error);
-      alert('Não foi possível salvar na nuvem. Confira a configuração do Supabase.');
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleArchive(id: string) {
-    const confirmArchive = window.confirm('Arquivar esta diligência? Ela não será apagada do histórico.');
-    if (!confirmArchive) return;
-
-    try {
-      const saved = await archiveDiligencia(id, diligencias);
-      setDiligencias((current) => current.map((item) => (item.id === saved.id ? saved : item)));
-    } catch (error) {
-      console.error(error);
-      alert('Não foi possível arquivar na nuvem. Confira a configuração do Supabase.');
-    }
-  }
-
-  async function handleSyncLocal() {
-    try {
-      const total = await syncLocalDiligenciasToCloud();
-      const loaded = await loadDiligencias();
-      setDiligencias(loaded);
-      setSyncMessage(total ? `${total} diligência(s) sincronizada(s) com a nuvem.` : 'Não há diligências locais para sincronizar.');
-    } catch (error) {
-      console.error(error);
-      setSyncMessage('Não foi possível sincronizar. Confira as variáveis do Supabase.');
-    }
-  }
-
-  return (
-    <main className="diligencias-page">
-      <DiligenciasToolbar search={search} onSearchChange={setSearch} onCreate={handleCreate} />
-
-      <section className="diligencias-cloud-panel">
-        <div>
-          <strong>Cloud Sync</strong>
-          <p>Use este botão uma vez para enviar ao Supabase as diligências que estavam salvas apenas neste navegador.</p>
-        </div>
-        <button type="button" className="diligencia-secondary-button" onClick={handleSyncLocal}>
-          Sincronizar dados locais
-        </button>
-      </section>
-
-      {syncMessage && <div className="diligencia-sync-message">{syncMessage}</div>}
-      {saving && <div className="diligencia-sync-message">Salvando diligência...</div>}
-
-      {showForm && (
-        <DiligenciaForm
-          diligencia={editing}
-          conflictMessage={conflictMessage}
-          onCancel={() => {
-            setShowForm(false);
-            setEditing(null);
-            setConflictMessage(null);
-          }}
-          onSubmit={handleSubmit}
-        />
-      )}
-
-      <section className="diligencias-summary">
-        <article>
-          <span>Total ativo</span>
-          <strong>{filteredDiligencias.length}</strong>
-        </article>
-        <article>
-          <span>Hoje</span>
-          <strong>{filteredDiligencias.filter((d) => d.data === new Date().toISOString().slice(0, 10)).length}</strong>
-        </article>
-        <article>
-          <span>Urgentes</span>
-          <strong>{filteredDiligencias.filter((d) => d.prioridade === 'Urgente').length}</strong>
-        </article>
-      </section>
-
-      {loading ? (
-        <section className="diligencia-form-panel">Carregando diligências...</section>
-      ) : filteredDiligencias.length === 0 ? (
-        <EmptyDiligencias onCreate={handleCreate} />
-      ) : (
-        <section className="diligencias-grid">
-          {filteredDiligencias.map((diligencia) => (
-            <DiligenciaCard
-              key={diligencia.id}
-              diligencia={diligencia}
-              onEdit={handleEdit}
-              onArchive={handleArchive}
-            />
-          ))}
-        </section>
-      )}
-    </main>
-  );
 }
+
+function solicitarArquivamento(
+    diligencia: Diligencia
+) {
+
+    setDiligenciaParaArquivar(diligencia);
+
+    setConfirmDialogOpen(true);
+
+}
+
+async function confirmarArquivamento() {
+
+    if (!diligenciaParaArquivar) return;
+
+    try {
+
+        await arquivar(diligenciaParaArquivar.id);
+
+        toast.success("Diligência arquivada com sucesso!");
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast.error("Erro ao arquivar.");
+
+    }
+
+    setConfirmDialogOpen(false);
+
+    setDiligenciaParaArquivar(null);
+
+}
+
+function fecharFormulario() {
+
+    setMostrarFormulario(false);
+
+    setDiligenciaSelecionada(null);
+
+}
+
+    async function salvar(
+    dados: DiligenciaFormData
+) {
+    try {
+
+        if (diligenciaSelecionada) {
+
+            await editar(
+                diligenciaSelecionada.id,
+                dados
+            );
+
+            toast.success(
+                "Diligência atualizada com sucesso!"
+            );
+
+        } else {
+
+            await criar(dados);
+
+            toast.success(
+                "Diligência cadastrada com sucesso!"
+            );
+
+        }
+
+        fecharFormulario();
+
+    } catch (error) {
+
+        console.error(error);
+
+        toast.error(
+            "Erro ao salvar a diligência."
+        );
+
+    }
+}
+
+           const diligenciasFiltradas = useMemo(() => {
+
+        let lista = [...diligencias];
+
+        if (textoPesquisaDebounce.trim()) {
+
+            const pesquisa =
+    textoPesquisaDebounce.toLowerCase();
+
+            lista = lista.filter((d) =>
+
+                d.numeroInterno
+                    .toLowerCase()
+                    .includes(pesquisa)
+
+                ||
+
+                d.contratante
+                    .toLowerCase()
+                    .includes(pesquisa)
+
+                ||
+
+                d.comarca
+                    .toLowerCase()
+                    .includes(pesquisa)
+
+                ||
+
+                (d.processo ?? "")
+                    .toLowerCase()
+                    .includes(pesquisa)
+
+            );
+
+        }
+
+        if (statusFiltro !== "todos") {
+
+            lista = lista.filter(
+
+                (d) =>
+                    d.status === statusFiltro
+
+            );
+
+        }
+
+        if (prioridadeFiltro !== "todas") {
+
+            lista = lista.filter(
+
+                (d) =>
+                    d.prioridade ===
+                    prioridadeFiltro
+
+            );
+
+        }
+
+        if (tipoFiltro !== "todos") {
+
+            lista = lista.filter(
+
+                (d) =>
+                    d.tipo === tipoFiltro
+
+            );
+
+        }
+                lista.sort((a, b) => {
+
+            switch (ordenacao) {
+
+                case "prioridade":
+
+                    return a.prioridade.localeCompare(
+                        b.prioridade
+                    );
+
+                case "status":
+
+                    return a.status.localeCompare(
+                        b.status
+                    );
+
+                case "contratante":
+
+                    return a.contratante.localeCompare(
+                        b.contratante
+                    );
+
+                default:
+
+                    return (
+                        new Date(
+                            `${a.data}T${a.hora}`
+                        ).getTime() -
+
+                        new Date(
+                            `${b.data}T${b.hora}`
+                        ).getTime()
+                    );
+
+            }
+
+        });
+
+        return lista;
+
+    }, [
+    diligencias,
+    textoPesquisaDebounce,
+    statusFiltro,
+    prioridadeFiltro,
+    tipoFiltro,
+    ordenacao,
+]);
+
+    if (loading) {
+
+    return (
+
+        <div className="container mx-auto p-6">
+
+            <div className="mb-6">
+
+                <div className="mb-3 h-8 w-60 animate-pulse rounded bg-gray-200"></div>
+
+                <div className="h-4 w-96 animate-pulse rounded bg-gray-200"></div>
+
+            </div>
+
+            <div className="grid gap-6">
+
+                <DiligenciaSkeleton />
+
+                <DiligenciaSkeleton />
+
+                <DiligenciaSkeleton />
+
+                <DiligenciaSkeleton />
+
+            </div>
+
+        </div>
+
+    );
+
+}
+
+    return (
+
+        <div className="container mx-auto p-6">
+
+            <div className="mb-6 flex items-center justify-between">
+
+                <div>
+
+                    <h1 className="text-3xl font-bold">
+
+                        Diligências
+
+                    </h1>
+
+                    <p className="text-gray-500">
+
+                        Gerencie todas as diligências do LexControl.
+
+                    </p>
+
+                </div>
+
+                <button
+
+                    type="button"
+
+                    onClick={novaDiligencia}
+
+                    className="rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700"
+
+                >
+
+                    Nova diligência
+
+                </button>
+
+            </div>
+
+            {error && (
+
+                <div className="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+
+                    {error}
+
+                </div>
+
+            )}
+
+            <DiligenciaStats
+
+                total={estatisticas.total}
+
+                abertas={estatisticas.abertas}
+
+                arquivadas={estatisticas.arquivadas}
+
+                contratado={estatisticas.contratado}
+
+                recebido={estatisticas.recebido}
+
+                pendente={estatisticas.pendente}
+
+            />
+
+            <DiligenciaFilters
+
+                textoPesquisa={textoPesquisa}
+
+                statusFiltro={statusFiltro}
+
+                prioridadeFiltro={prioridadeFiltro}
+
+                tipoFiltro={tipoFiltro}
+
+                ordenacao={ordenacao}
+
+                onTextoPesquisa={setTextoPesquisa}
+
+                onStatusFiltro={setStatusFiltro}
+
+                onPrioridadeFiltro={setPrioridadeFiltro}
+
+                onTipoFiltro={setTipoFiltro}
+
+                onOrdenacao={setOrdenacao}
+
+            />
+                        {diligenciasFiltradas.length === 0 ? (
+
+                <EmptyState
+                    onNovaDiligencia={novaDiligencia}
+                />
+
+            ) : (
+
+                <div className="grid gap-6">
+
+                    {diligenciasFiltradas.map((diligencia) => (
+
+                        <DiligenciaCard
+
+                            key={diligencia.id}
+
+                            diligencia={diligencia}
+
+                            onEdit={editarDiligencia}
+
+                            onArchive={() => solicitarArquivamento(diligencia)}
+
+                        />
+
+                    ))}
+
+                </div>
+
+            )}
+
+            {mostrarFormulario && (
+
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+
+                    <div className="max-h-[95vh] w-full max-w-5xl overflow-auto rounded-xl bg-white shadow-2xl">
+
+                        <DiligenciaForm
+
+                            diligencia={diligenciaSelecionada}
+
+                            conflictMessage={conflictMessage}
+
+                            onCancel={fecharFormulario}
+
+                            onSubmit={salvar}
+
+                        />
+
+                        <div className="border-t bg-gray-50 px-6 py-4">
+
+                            <div className="flex items-center justify-between">
+
+                                <span className="text-sm text-gray-500">
+
+                                    {saving
+                                        ? "Salvando..."
+                                        : diligenciaSelecionada
+                                        ? "Editando diligência"
+                                        : "Nova diligência"}
+
+                                </span>
+
+                                <button
+
+                                    type="button"
+
+                                    onClick={fecharFormulario}
+
+                                    className="rounded border px-4 py-2 hover:bg-gray-100"
+
+                                >
+
+                                    Fechar
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+            <ConfirmDialog
+
+    open={confirmDialogOpen}
+
+    title="Arquivar diligência"
+
+    message="Tem certeza que deseja arquivar esta diligência? Ela continuará disponível no histórico."
+
+    onCancel={() => {
+
+        setConfirmDialogOpen(false);
+
+        setDiligenciaParaArquivar(null);
+
+    }}
+
+    onConfirm={confirmarArquivamento}
+
+/>
+                    </div>
+
+    );
+
+}
+export default DiligenciasPage;

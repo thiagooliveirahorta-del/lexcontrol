@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '../../../components/ui/Badge';
-import { Button } from '../../../components/ui/Button';
+import { Button } from "../../../components/ui";
 
 import { loadDiligencias } from '../../diligencias/services/diligenciasStorage';
 import type { Diligencia } from '../../diligencias/types/diligencia';

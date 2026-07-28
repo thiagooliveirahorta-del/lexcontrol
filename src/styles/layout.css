@@ -1,0 +1,497 @@
+@import './variables.css';
+
+/* ==========================================================
+   RESET
+========================================================== */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+body {
+  overflow: hidden;
+}
+
+/* ==========================================================
+   APP
+========================================================== */
+
+.lex-app {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background);
+}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.lex-sidebar {
+  width: var(--sidebar-width);
+  background: var(--color-sidebar);
+  color: var(--color-text-white);
+
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+
+  box-shadow: var(--shadow-md);
+
+  transition: width var(--transition);
+}
+
+.lex-sidebar-logo {
+  height: var(--header-height);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 1px solid rgba(255,255,255,.08);
+
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.lex-sidebar-nav {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 20px 12px;
+}
+
+.lex-sidebar-footer {
+  padding: 18px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* ==========================================================
+   MENU
+========================================================== */
+
+.lex-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 14px 16px;
+
+  border-radius: var(--radius-md);
+
+  text-decoration: none;
+
+  color: #CBD5E1;
+
+  transition: all var(--transition-fast);
+}
+
+.lex-menu-item:hover {
+  background: rgba(255,255,255,.06);
+  color: white;
+}
+
+.lex-menu-item.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.lex-menu-item svg {
+  flex-shrink: 0;
+}
+
+.lex-menu-item span {
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.lex-container {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.lex-header {
+
+  height: var(--header-height);
+
+  background: var(--color-header);
+
+  border-bottom: 1px solid var(--color-border);
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 0 28px;
+
+  box-shadow: var(--shadow-sm);
+
+  z-index: 100;
+}
+
+.lex-header-left,
+.lex-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* ==========================================================
+   MAIN
+========================================================== */
+
+.lex-main {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 32px;
+
+  background: var(--color-background);
+}
+
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  font-size: var(--font-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.page-subtitle {
+  margin-top: 6px;
+
+  color: var(--color-text-light);
+
+  font-size: var(--font-sm);
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+.lex-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lex-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lex-main::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 20px;
+}
+
+.lex-main::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* ==========================================================
+   RESPONSIVIDADE
+========================================================== */
+
+@media (max-width: 1200px) {
+
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+@media (max-width: 960px) {
+
+  .lex-sidebar {
+    width: 84px;
+  }
+
+  .lex-sidebar-logo {
+    font-size: 1rem;
+  }
+
+  .lex-menu-item {
+    justify-content: center;
+    padding: 14px;
+  }
+
+  .lex-menu-item span {
+    display: none;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  body {
+    overflow: auto;
+  }
+
+  .lex-app {
+    flex-direction: column;
+  }
+
+  .lex-sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .lex-sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px;
+  }
+
+  .lex-sidebar-footer {
+    display: none;
+  }
+
+  .lex-header {
+    padding: 0 16px;
+  }
+
+  .lex-main {
+    padding: 20px;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .page-title {
+    font-size: 1.4rem;
+  }
+
+  .lex-header {
+    height: 64px;
+  }
+
+}
+
+/* ==========================================================
+   HEADER COMPONENTS
+========================================================== */
+
+.lex-search {
+  width: 420px;
+  max-width: 100%;
+
+  height: 44px;
+
+  background: white;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 0 14px;
+
+  gap: 10px;
+}
+
+.lex-search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+.lex-search-icon {
+  color: var(--color-text-light);
+}
+
+.lex-search-input {
+  flex: 1;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  font-size: 14px;
+}
+
+.lex-button-primary {
+
+  height: 42px;
+
+  padding: 0 18px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: var(--color-primary);
+
+  color: white;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  font-weight: 600;
+
+  transition: .25s;
+}
+
+.lex-button-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.lex-header-icon {
+
+  width: 42px;
+
+  height: 42px;
+
+  border-radius: 10px;
+
+  border: 1px solid var(--color-border);
+
+  background: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.lex-header-icon:hover {
+  background: #F1F5F9;
+}
+
+.lex-user {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding-left: 10px;
+
+  border-left: 1px solid var(--color-border);
+}
+
+.lex-user-info {
+
+  display: flex;
+
+  flex-direction: column;
+
+  line-height: 1.2;
+}
+
+.lex-user-info small {
+  color: var(--color-text-light);
+}
+
+@media (max-width:900px){
+
+  .lex-search{
+    width:240px;
+  }
+
+  .lex-user-info{
+    display:none;
+  }
+
+}
+
+@media (max-width:700px){
+
+  .lex-search{
+    display:none;
+  }
+
+  .lex-button-primary{
+    display:none;
+  }
+
+}

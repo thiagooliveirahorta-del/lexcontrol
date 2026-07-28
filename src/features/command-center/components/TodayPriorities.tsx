@@ -20,6 +20,8 @@ const money = new Intl.NumberFormat('pt-BR', {
 export function TodayPriorities() {
   const [diligencias, setDiligencias] = useState<Diligencia[]>([]);
 
+  const proxima = diligencias[0];
+
   useEffect(() => {
     async function load() {
       const data = await loadDiligencias();
@@ -55,6 +57,13 @@ export function TodayPriorities() {
 
         <Badge>{String(diligencias.length)}</Badge>
       </div>
+
+      {proxima && (
+        <div className="diligencia-sync-message">
+          <strong>Próxima diligência:</strong>{' '}
+          {proxima.hora} • {proxima.tipo}
+        </div>
+      )}
 
       <div className="taskList">
         {diligencias.length === 0 ? (
