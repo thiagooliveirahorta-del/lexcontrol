@@ -59,6 +59,33 @@ export default function CardActions({
         window.open(`https://wa.me/${numero}`, "_blank", "noopener,noreferrer");
     }
 
+    function iniciarChamada() {
+        const telefoneOriginal = diligencia.telefone?.trim();
+
+        if (!telefoneOriginal) {
+            toast.error("Esta diligência não possui telefone cadastrado.");
+            return;
+        }
+
+        let telefone = telefoneOriginal.replace(/\D/g, "");
+
+        if (telefone.startsWith("00")) {
+            telefone = telefone.slice(2);
+        } else if (
+            !telefoneOriginal.startsWith("+") &&
+            !(telefone.startsWith("55") && (telefone.length === 12 || telefone.length === 13))
+        ) {
+            telefone = `55${telefone}`;
+        }
+
+        if (telefone.length < 8 || telefone.length > 15) {
+            toast.error("O telefone cadastrado é inválido.");
+            return;
+        }
+
+        window.location.href = `tel:+${telefone}`;
+    }
+
     return (
         <div className="mt-6 flex flex-wrap gap-2">
 
@@ -91,6 +118,7 @@ export default function CardActions({
 
             <button
                 type="button"
+                onClick={iniciarChamada}
                 className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 hover:bg-slate-100"
             >
                 <Phone size={16} />
