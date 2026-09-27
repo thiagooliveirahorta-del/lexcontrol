@@ -32,6 +32,33 @@ export default function CardActions({
         window.open(url, "_blank", "noopener,noreferrer");
     }
 
+    function abrirWhatsApp() {
+        const numeroOriginal = diligencia.whatsapp?.trim();
+
+        if (!numeroOriginal) {
+            toast.error("Esta diligência não possui WhatsApp cadastrado.");
+            return;
+        }
+
+        let numero = numeroOriginal.replace(/\D/g, "");
+
+        if (numero.startsWith("00")) {
+            numero = numero.slice(2);
+        } else if (
+            !numeroOriginal.startsWith("+") &&
+            !(numero.startsWith("55") && (numero.length === 12 || numero.length === 13))
+        ) {
+            numero = `55${numero}`;
+        }
+
+        if (!numero) {
+            toast.error("O número de WhatsApp cadastrado é inválido.");
+            return;
+        }
+
+        window.open(`https://wa.me/${numero}`, "_blank", "noopener,noreferrer");
+    }
+
     return (
         <div className="mt-6 flex flex-wrap gap-2">
 
@@ -55,6 +82,7 @@ export default function CardActions({
 
             <button
                 type="button"
+                onClick={abrirWhatsApp}
                 className="flex items-center gap-2 rounded-lg border border-green-300 px-4 py-2 text-green-700 hover:bg-green-50"
             >
                 <MessageCircle size={16} />
