@@ -8,17 +8,24 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import type { Diligencia } from "../types/diligencia";
+import { statusDiligencia } from "../types/diligencia";
+import type { Diligencia, DiligenciaStatus } from "../types/diligencia";
+
+const statusRapidos = statusDiligencia.filter(
+    (status): status is Exclude<DiligenciaStatus, "Arquivada"> => status !== "Arquivada"
+);
 
 type Props = {
     diligencia: Diligencia;
     onEdit: (diligencia: Diligencia) => void;
+    onStatusChange: (status: Exclude<DiligenciaStatus, "Arquivada">) => Promise<void>;
     onArchive: () => void;
 };
 
 export default function CardActions({
     diligencia,
     onEdit,
+    onStatusChange,
     onArchive,
 }: Props) {
     function abrirMapa() {
@@ -107,6 +114,17 @@ export default function CardActions({
         }
     }
 
+    function selecionarStatus(statusSelecionado: string) {
+        const status = statusRapidos.find((item) => item === statusSelecionado);
+
+        if (status && status !== diligencia.status) {
+            void onStatusChange(status);
+        }
+    }
+
+    const statusAtual = statusRapidos.find((status) => status === diligencia.status) ?? "";
+    const diligenciaArquivada = diligencia.arquivada || diligencia.status === "Arquivada";
+
     return (
         <div className="mt-6 flex flex-wrap gap-2">
 
@@ -163,6 +181,23 @@ export default function CardActions({
                 <Copy size={16} />
                 Copiar endereço
             </button>
+
+            <select
+                aria-label={`Alterar status da diligência ${diligencia.numeroInterno}`}
+                value={statusAtual}
+                disabled={diligenciaArquivada}
+                onChange={(event) => selecionarStatus(event.currentTarget.value)}
+                className="min-h-10 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+                <option value="" disabled>
+                    {diligenciaArquivada ? "Diligência arquivada" : "Alterar status"}
+                </option>
+                {statusRapidos.map((status) => (
+                    <option key={status} value={status}>
+                        {status}
+                    </option>
+                ))}
+            </select>
 
             <button
                 type="button"

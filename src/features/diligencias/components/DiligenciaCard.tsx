@@ -3,11 +3,12 @@ import CardInfo from "./CardInfo";
 import CardFinanceiro from "./CardFinanceiro";
 import CardActions from "./CardActions";
 
-import type { Diligencia } from "../types/diligencia";
+import type { Diligencia, DiligenciaStatus } from "../types/diligencia";
 
 type Props = {
   diligencia: Diligencia;
   onEdit: (diligencia: Diligencia) => void;
+  onStatusChange: (status: Exclude<DiligenciaStatus, "Arquivada">) => Promise<void>;
   onArchive: () => void;
 };
 
@@ -33,6 +34,7 @@ function badgeStatus(status: string) {
 export default function DiligenciaCard({
   diligencia,
   onEdit,
+  onStatusChange,
   onArchive,
 }: Props) {
   return (
@@ -63,6 +65,7 @@ export default function DiligenciaCard({
       <CardActions
         diligencia={diligencia}
         onEdit={onEdit}
+        onStatusChange={onStatusChange}
         onArchive={onArchive}
       />
 

@@ -2,13 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
     Diligencia,
-    DiligenciaFormData
+    DiligenciaFormData,
+    DiligenciaStatus,
 } from "../types/diligencia";
 
 import {
     loadDiligencias,
     createDiligencia,
     updateDiligencia,
+    updateDiligenciaStatus,
     archiveDiligencia,
     hasScheduleConflict
 } from "../services/diligenciasStorage";
@@ -208,6 +210,29 @@ export function useDiligencias() {
 
     );
 
+    const alterarStatus = useCallback(
+        async (id: string, status: Exclude<DiligenciaStatus, "Arquivada">) => {
+            try {
+                setSaving(true);
+
+                const atualizada = await updateDiligenciaStatus(
+                    id,
+                    status,
+                    diligencias
+                );
+
+                setDiligencias((old) =>
+                    old.map((d) => (d.id === id ? atualizada : d))
+                );
+
+                return atualizada;
+            } finally {
+                setSaving(false);
+            }
+        },
+        [diligencias]
+    );
+
     // ===========================
     // Arquivar
     // ===========================
@@ -330,6 +355,8 @@ export function useDiligencias() {
         criar,
 
         editar,
+
+        alterarStatus,
 
         arquivar
 

@@ -1,5 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../../../lib/supabaseClient';
-import type { Diligencia, DiligenciaFormData, TimelineEvento } from '../types/diligencia';
+import type { Diligencia, DiligenciaFormData, DiligenciaStatus, TimelineEvento } from '../types/diligencia';
 
 const STORAGE_KEY = 'lexcontrol_diligencias_v1';
 const TABLE = 'diligencias';
@@ -195,6 +195,44 @@ export async function updateDiligencia(
   current: Diligencia[],
 ): Promise<Diligencia> {
   const diligencia = updateDiligenciaObject(id, data, current);
+  const saved = await upsertDiligencia(diligencia);
+  const next = current.map((item) => (item.id === id ? saved : item));
+  saveLocalDiligencias(next);
+  return saved;
+}
+
+export function updateDiligenciaStatusObject(
+  id: string,
+  status: Exclude<DiligenciaStatus, 'Arquivada'>,
+  current: Diligencia[],
+): Diligencia {
+  const now = new Date().toISOString();
+  const existing = current.find((diligencia) => diligencia.id === id);
+
+  if (!existing) throw new Error('Diligência não encontrada.');
+
+  return {
+    ...existing,
+    status,
+    updatedAt: now,
+    timeline: [
+      ...existing.timeline,
+      {
+        id: crypto.randomUUID(),
+        dataHora: now,
+        titulo: 'Status da diligência atualizado',
+        descricao: `Status alterado de ${existing.status} para ${status}.`,
+      },
+    ],
+  };
+}
+
+export async function updateDiligenciaStatus(
+  id: string,
+  status: Exclude<DiligenciaStatus, 'Arquivada'>,
+  current: Diligencia[],
+): Promise<Diligencia> {
+  const diligencia = updateDiligenciaStatusObject(id, status, current);
   const saved = await upsertDiligencia(diligencia);
   const next = current.map((item) => (item.id === id ? saved : item));
   saveLocalDiligencias(next);

@@ -13,6 +13,7 @@ import { DiligenciaSkeleton } from "../components/DiligenciaSkeleton";
 import type {
     Diligencia,
     DiligenciaFormData,
+    DiligenciaStatus,
 } from "../types/diligencia";
 
 function DiligenciasPage() {
@@ -34,6 +35,8 @@ function DiligenciasPage() {
         criar,
 
         editar,
+
+        alterarStatus,
 
         arquivar,
 
@@ -128,6 +131,19 @@ function solicitarArquivamento(
 
     setConfirmDialogOpen(true);
 
+}
+
+async function alterarStatusCartao(
+    diligencia: Diligencia,
+    status: Exclude<DiligenciaStatus, "Arquivada">
+) {
+    try {
+        await alterarStatus(diligencia.id, status);
+        toast.success(`Status atualizado para ${status}.`);
+    } catch (error) {
+        console.error(error);
+        toast.error("Erro ao atualizar o status da diligência.");
+    }
 }
 
 async function confirmarArquivamento() {
@@ -460,6 +476,8 @@ function fecharFormulario() {
                             onEdit={editarDiligencia}
 
                             onArchive={() => solicitarArquivamento(diligencia)}
+
+                            onStatusChange={(status) => alterarStatusCartao(diligencia, status)}
 
                         />
 
