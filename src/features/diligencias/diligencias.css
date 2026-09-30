@@ -250,7 +250,31 @@
 }
 
 .diligencia-form-panel {
-  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(16px, 2vw, 28px);
+}
+
+.diligencia-form-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+  max-height: calc(100dvh - 16px);
+  overflow: hidden;
+  width: min(100%, 960px);
+}
+
+.diligencia-form-modal > .diligencia-form-panel {
+  flex: 1 1 auto;
+}
+
+.diligencia-form-modal__status {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  flex: 0 0 auto;
+  padding: 10px 20px;
 }
 
 .diligencia-form-panel__header {
@@ -259,6 +283,7 @@
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 18px;
+  flex: 0 0 auto;
 }
 
 .diligencia-form-panel__header span {
@@ -271,7 +296,7 @@
 
 .diligencia-form-panel__header h3 {
   color: #151917;
-  font-size: 26px;
+  font-size: clamp(20px, 2vw, 26px);
   margin: 4px 0 0;
 }
 
@@ -283,12 +308,30 @@
   font-weight: 800;
   margin-bottom: 16px;
   padding: 12px 14px;
+  flex: 0 0 auto;
 }
 
 .diligencia-form {
+  align-content: start;
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 1 1 auto;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 4px 12px;
+}
+
+.diligencia-form > section {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.diligencia-form > section > div {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .diligencia-form label {
@@ -298,6 +341,7 @@
   font-size: 13px;
   font-weight: 800;
   gap: 6px;
+  min-width: 0;
 }
 
 .diligencia-form input,
@@ -314,7 +358,35 @@
 }
 
 .diligencia-form textarea {
-  min-height: 90px;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.diligencia-form input,
+.diligencia-form select,
+.diligencia-form textarea {
+  box-sizing: border-box;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.diligencia-form-panel__actions {
+  align-items: center;
+  background: #fffaf2;
+  border-top: 1px solid #e5dac8;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 14px 4px 2px;
+}
+
+.diligencia-form-panel__actions button {
+  justify-content: center;
+  min-height: 48px;
 }
 
 .full {
@@ -359,8 +431,7 @@
 
 @media (max-width: 980px) {
   .diligencias-toolbar,
-  .diligencias-toolbar__actions,
-  .diligencia-form-panel__header {
+  .diligencias-toolbar__actions {
     align-items: stretch;
     flex-direction: column;
   }
@@ -375,6 +446,31 @@
   .diligencias-summary,
   .diligencia-form {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .diligencia-form-modal {
+    max-height: calc(100dvh - 16px);
+  }
+
+  .diligencia-form > section > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .diligencia-form-panel__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .diligencia-form-modal__status {
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .diligencia-form-panel__actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

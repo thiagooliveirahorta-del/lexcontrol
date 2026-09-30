@@ -3,6 +3,13 @@ import type { Diligencia, DiligenciaFormData } from '../types/diligencia';
 import { prioridadesDiligencia, statusDiligencia, tiposDiligencia } from '../types/diligencia';
 import FormSection from "../../../components/ui/FormSection";
 import DadosSection from "./form/DadosSection";
+import ContratanteSection from "./form/ContratanteSection";
+import ProcessoSection from "./form/ProcessoSection";
+import AgendamentoSection from "./form/AgendamentoSection";
+import FinanceiroSection from "./form/FinanceiroSection";
+import ObservacoesSection from "./form/ObservacoesSection";
+
+import '../diligencias.css';
 
 type Props = {
   diligencia?: Diligencia | null;
@@ -70,101 +77,74 @@ export function DiligenciaForm({ diligencia, conflictMessage, onCancel, onSubmit
           <span>Cadastro rápido</span>
           <h3>{diligencia ? 'Editar diligência' : 'Nova diligência'}</h3>
         </div>
-        <button type="button" className="diligencia-secondary-button" onClick={onCancel}>
-          Fechar
-        </button>
       </div>
 
       {conflictMessage && <div className="diligencia-conflict">⚠ {conflictMessage}</div>}
 
-      <form className="diligencia-form" onSubmit={handleSubmit}>
+      <form id="diligencia-form" className="diligencia-form" onSubmit={handleSubmit}>
         <FormSection titulo="📋 Dados da diligência">
-    <DadosSection
-        values={{
-            tipo: values.tipo,
-            status: values.status,
-            prioridade: values.prioridade,
-        }}
-        tipos={tiposDiligencia}
-        statusList={statusDiligencia}
-        prioridades={prioridadesDiligencia}
-    />
-</FormSection>
+          <DadosSection
+            values={{
+              tipo: values.tipo,
+              status: values.status,
+              prioridade: values.prioridade,
+            }}
+            tipos={tiposDiligencia}
+            statusList={statusDiligencia}
+            prioridades={prioridadesDiligencia}
+          />
+        </FormSection>
 
-        <label>
-          Contratante*
-          <input name="contratante" defaultValue={values.contratante} required placeholder="Escritório ou advogado contratante" />
-        </label>
+        <FormSection titulo="Contratante e contato">
+          <ContratanteSection
+            values={{
+              contratante: values.contratante,
+              advogadoSolicitante: values.advogadoSolicitante ?? '',
+              telefone: values.telefone ?? '',
+              whatsapp: values.whatsapp ?? '',
+              email: values.email ?? '',
+            }}
+          />
+        </FormSection>
 
-        <label>
-          Advogado solicitante
-          <input name="advogadoSolicitante" defaultValue={values.advogadoSolicitante} placeholder="Nome do solicitante" />
-        </label>
+        <FormSection titulo="Processo">
+          <ProcessoSection
+            values={{
+              processo: values.processo ?? '',
+              tribunal: values.tribunal ?? '',
+              vara: values.vara ?? '',
+              comarca: values.comarca,
+              endereco: values.endereco ?? '',
+            }}
+          />
+        </FormSection>
 
-        <label>
-          WhatsApp
-          <input name="whatsapp" defaultValue={values.whatsapp} placeholder="21999999999" />
-        </label>
+        <FormSection titulo="Agendamento">
+          <AgendamentoSection values={{ data: values.data, hora: values.hora }} />
+        </FormSection>
 
-        <label>
-          Processo
-          <input name="processo" defaultValue={values.processo} placeholder="0000000-00.0000.0.00.0000" />
-        </label>
+        <FormSection titulo="Financeiro">
+          <FinanceiroSection
+            values={{
+              valorContratado: values.valorContratado,
+              valorRecebido: values.valorRecebido,
+            }}
+          />
+        </FormSection>
 
-        <label>
-          Tribunal
-          <input name="tribunal" defaultValue={values.tribunal} placeholder="TJ/RJ, TRT, JF..." />
-        </label>
+        <FormSection titulo="Observações">
+          <ObservacoesSection values={{ observacoes: values.observacoes ?? '' }} />
+        </FormSection>
 
-        <label>
-          Vara
-          <input name="vara" defaultValue={values.vara} placeholder="Ex.: 2ª Vara Cível" />
-        </label>
-
-        <label>
-          Comarca*
-          <input name="comarca" defaultValue={values.comarca} required placeholder="Ex.: Rio de Janeiro/RJ" />
-        </label>
-
-        <label>
-          Data*
-          <input name="data" type="date" defaultValue={values.data} required />
-        </label>
-
-        <label>
-          Hora*
-          <input name="hora" type="time" defaultValue={values.hora} required />
-        </label>
-
-        <label className="full">
-          Endereço/local
-          <input name="endereco" defaultValue={values.endereco} placeholder="Fórum, cartório ou endereço completo" />
-        </label>
-
-        <label>
-          Valor contratado
-          <input name="valorContratado" type="number" min="0" step="0.01" defaultValue={values.valorContratado} />
-        </label>
-
-        <label>
-          Valor recebido
-          <input name="valorRecebido" type="number" min="0" step="0.01" defaultValue={values.valorRecebido} />
-        </label>
-
-        <label>
-          E-mail
-          <input name="email" type="email" defaultValue={values.email} />
-        </label>
-
-        <label className="full">
-          Observações
-          <textarea name="observacoes" defaultValue={values.observacoes} placeholder="Orientações, documentos necessários, observações do contratante..." />
-        </label>
-
-        <button type="submit" className="diligencia-primary-button full">
+      </form>
+      <div className="diligencia-form-panel__actions">
+        <button type="button" className="diligencia-secondary-button" onClick={onCancel}>
+          Cancelar
+        </button>
+        <button type="submit" form="diligencia-form" className="diligencia-primary-button">
           Salvar diligência
         </button>
-      </form>
+      </div>
     </section>
   );
 }

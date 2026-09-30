@@ -489,9 +489,9 @@ function fecharFormulario() {
 
             {mostrarFormulario && (
 
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
 
-                    <div className="max-h-[95vh] w-full max-w-5xl overflow-auto rounded-xl bg-white shadow-2xl">
+                    <div className="diligencia-form-modal rounded-xl bg-white shadow-2xl">
 
                         <DiligenciaForm
 
@@ -505,36 +505,16 @@ function fecharFormulario() {
 
                         />
 
-                        <div className="border-t bg-gray-50 px-6 py-4">
+                        <div className="diligencia-form-modal__status">
+                            <span className="text-sm text-gray-500">
 
-                            <div className="flex items-center justify-between">
+                                {saving
+                                    ? "Salvando..."
+                                    : diligenciaSelecionada
+                                    ? "Editando diligência"
+                                    : "Nova diligência"}
 
-                                <span className="text-sm text-gray-500">
-
-                                    {saving
-                                        ? "Salvando..."
-                                        : diligenciaSelecionada
-                                        ? "Editando diligência"
-                                        : "Nova diligência"}
-
-                                </span>
-
-                                <button
-
-                                    type="button"
-
-                                    onClick={fecharFormulario}
-
-                                    className="rounded border px-4 py-2 hover:bg-gray-100"
-
-                                >
-
-                                    Fechar
-
-                                </button>
-
-                            </div>
-
+                            </span>
                         </div>
 
                     </div>
